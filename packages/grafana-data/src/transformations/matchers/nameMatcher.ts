@@ -115,8 +115,13 @@ function fieldNameFallback(fields: Set<string>) {
       );
     };
   } else if (fields.has('Time') || fields.has('time')) {
+    // The fallback bridges the 'Time'/'time' casing difference for the frame's time field only.
+    // Matching every time-typed field would also hide unrelated time columns (e.g. excluding
+    // 'time' would also exclude a 'created' time field).
     fallback = (field: Field, frame: DataFrame) => {
-      return frame.meta?.typeVersion == null && field.type === FieldType.time;
+      return (
+        frame.meta?.typeVersion == null && field.type === FieldType.time && field.name.toLowerCase() === 'time'
+      );
     };
   }
 
